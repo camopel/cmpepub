@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Admin</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+var userMap = {};
+function getCookie(name) {
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + name + "=");
+  if (parts.length == 2) return parts.pop().split(";").shift();
+}
+function download(e){
+	var pdfID = $(e.target).attr("id");
+	$("#pdfID").val(pdfID);
+	$("#downloadForm").attr("action",'/user/download').submit();	
+}
+function onLoadTab1(){
+	$("#tab1 tbody").empty();
+	$.ajax({
+		url: "/admin/user",
+		type: 'get',
+		data: 'sjsuid=admin',
+		success: function (data) {
+			if (data.redirect) window.location.href = data.redirect;
+			else if(data.success=='false') alert(data.msg);
+			else{
+				var items = data.data;
+				userMap = {};
+				items.forEach(function(e) {
+					var name = e.firstname+" "+e.lastname;
+					userMap[e.sjsuid] = name;
+					$("#tab1 tbody").append("<tr id='"+e._id+"'><td>"+name+"</td><td>"+e.rank+"</td><td>"+e.year+"</td></tr>");
+				});
+			}
+		},
+		error: function(error){ alert('Error!'+error); }
+	});
+}
+function onLoadTab2(){
+	$("#tab2 tbody").empty();
+	$.ajax({
+		url: "/admin/journal",
+		type: 'get',
+		data: 'sjsuid=admin',
+		success: function (data) {
+			if (data.redirect) window.location.href = data.redirect;
+			else if(data.success=='false') alert(data.msg);
+			else{
+				var items = data.data;				
+				items.forEach(function(e) {
+					var name = userMap[e.sjsuid];
+					var pdf = e.pdfID==""?"-":"<a id='"+e.pdfID+"'>Download</a>";					
+					$("#tab2 tbody").append("<tr id='"+e._id+"'><td>"+name+"</td><td>"+e.title+"</td><td>"+e.authors+"</td><td>"+e.affiliation+"</td><td>"+e.coauthors+"</td><td>"+e.correspondingAuthor+"</td><td>"+e.journalTitle+"</td><td>"+e.journalURL+"</td><td>"+e.pubMonthYear+"</td><td>"+e.issueNumber+"</td><td>"+e.pagesNumber+"</td><td>"+e.impactFactor+"</td><td>"+e.pubOnline+"</td><td>"+e.monthYearOnline+"</td><td>"+e.urlOnline+"</td><td>"+pdf+"</td></tr>");
+					if(e.pdfID!="") $("#tab2 td a").click(download);
+				});
+			}
+		},
+		error: function(error){ alert('Error!'+error); }
+	});
+}
+function onLoadTab3(){
+	$("#tab3 tbody").empty();
+	$.ajax({
+		url: "/admin/conference",
+		type: 'get',
+		data: 'sjsuid=admin',
+		success: function (data) {
+			if (data.redirect) window.location.href = data.redirect;
+			else if(data.success=='false') alert(data.msg);
+			else{
+				var items = data.data;				
+				items.forEach(function(e) {
+					var name = userMap[e.sjsuid];
+					var pdf = e.pdfID==""?"-":"<a id='"+e.pdfID+"'>Download</a>";					
+					$("#tab3 tbody").append("<tr id='"+e._id+"'><td>"+name+"</td><td>"+e.title+"</td><td>"+e.authors+"</td><td>"+e.affiliation+"</td><td>"+e.coauthors+"</td><td>"+e.conferenceTitle+"</td><td>"+e.location+"</td><td>"+e.heldDate+"</td><td>"+e.conferenceDomain+"</td><td>"+e.sponsor+"</td><td>"+e.reviewed+"</td><td>"+e.pubRange+"</td><td>"+e.urlOnline+"</td><td>"+pdf+"</td></tr>");
+					if(e.pdfID!="") $("#tab3 td a").click(download);
+				});				
+			}
+		},
+		error: function(error){ alert('Error!'+error); }
+	});
+}
+function onLoadTab4(){
+	$("#tab4 tbody").empty();
+	$.ajax({
+		url: "/admin/thesis",
+		type: 'get',
+		data: 'sjsuid=admin',
+		success: function (data) {
+			if (data.redirect) window.location.href = data.redirect;
+			else if(data.success=='false') alert(data.msg);
+			else{
+				var items = data.data;				
+				items.forEach(function(e) {
+					var name = userMap[e.sjsuid];
+					$("#tab4 tbody").append("<tr id='"+e._id+"'><td>"+name+"</td><td>"+e.title+"</td><td>"+e.student+"</td><td>"+e.department+"</td><td>"+e.completeDate+"</td><td>"+e.journalPaperPub+"</td><td>"+e.journalPubList+"</td><td>"+e.confPaperPub+"</td><td>"+e.confPubList+"</td></tr>");
+				});
+			}
+		},
+		error: function(error){ alert('Error!'+error); }
+	});
+}
+$(function(){
+	if(document.cookie.indexOf('sjsuid')==-1 || getCookie('sjsuid')!="admin") window.location.href="/view/login.html";
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+		var target = $(e.target).attr("href");
+		if (target == '#tab1') onLoadTab1();
+		else if (target == '#tab2') onLoadTab2();
+		else if (target == '#tab3') onLoadTab3();
+		else if (target == '#tab4') onLoadTab4();
+	});
+	onLoadTab1();
+});
+</script>
+</head>
+<body>
+<div style="text-align: center"><img src="/images/head.gif"></div>
+<div class="container" style="margin-top:20px">
+	<h5><a href="/login/logout" style="float:right">Logout</a></h5>
+	<ul class="nav nav-tabs" style="font-weight:bold">
+		<li class="active"><a data-toggle="tab" href="#tab1">Users</a></li>
+		<li><a data-toggle="tab" href="#tab2">Journal Publication</a></li>
+		<li><a data-toggle="tab" href="#tab3">Conference Publication</a></li>
+		<li><a data-toggle="tab" href="#tab4">MS Thesis Supervised</a></li>
+	</ul>
+	<div class="tab-content" style="padding:15px">
+		<div id="tab1" class="tab-pane fade in active">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Present Rank</th>
+						<th>Year Joined SJSU</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+		<div id="tab2" class="tab-pane fade" >
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>Faculty Name</th>
+						<th>Publication Title</th>
+						<th>Authors List</th>
+						<th>Authors Affiliations</th>
+						<th>Student Coauthors</th>
+						<th>Corresponding Author</th>
+						<th>Journal Title</th>
+						<th>Journal URL</th>
+						<th>Month & Year Published in Print</th>
+						<th>Journal Issue Number</th>						
+						<th>Pages Number</th>
+						<th>Journal Impact Factor</th>
+						<th>Published Online</th>
+						<th>Month Appeared Online</th>
+						<th>URL of Online Publication</th>
+						<th>PDF</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+		<div id="tab3" class="tab-pane fade">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>Faculty Name</th>
+						<th>Publication Title</th>
+						<th>Authors List</th>
+						<th>Authors Affiliations</th>
+						<th>Student Coauthors</th>
+						<th>Conference Title</th>
+						<th>Location Held</th>
+						<th>Held Date</th>
+						<th>National/International Conference</th>
+						<th>Sponsoring Professional Organization</th>						
+						<th>Reviewd Publication</th>
+						<th>Full Text or Abstract Published</th>
+						<th>URL to Conference Publication</th>
+						<th>PDF</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+		<div id="tab4" class="tab-pane fade" >
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>Faculty Name</th>
+						<th>Thesis Title</th>
+						<th>SJSU Student Name</th>
+						<th>Student Department</th>
+						<th>Completed Month & Year</th>
+						<th>Joint Journal Paper Published</th>
+						<th>Journal Pub List</th>
+						<th>Conference Paper Published</th>
+						<th>Conference Pub List</th>						
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<form id="downloadForm" method="POST">
+	<input type="text" name="pdfID" id="pdfID" style="display:none">
+	<input type="submit" style="display:none">
+</form>
+</body>
+</html>
