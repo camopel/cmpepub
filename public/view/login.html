@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Computer Engineering Department</title>
+<link href="/stylesheets/login.css" type="text/css" rel="stylesheet">
+<script src="/javascripts/jquery.js"></script>
+<script>
+$(document).ready(function(){
+	$("#siginin-form").on("submit",function(event){
+		event.preventDefault();
+		signin();
+	});
+	$("#signin-button").click(signin);
+	function signin()
+	{
+		if($('#sjsueml').val()==""||$('#password').val()=="") $('#msg').text("Email and Password can not be blank!");
+		else if($('#sjsueml').val().toLowerCase()=="admin" || $('#sjsueml').val().toLowerCase().endsWith("@sjsu.edu")){
+			$('#msg').text("");
+			$.ajax({
+				url: '/login',
+				type: 'post',
+				dataType: 'json',
+				data: $('#siginin-form').serialize(),
+				success: function(data) {					
+					if(data.success=='true'){
+						window.location = data.redirectpage;						
+					}
+					else{
+						$('#msg').text(data.msg);
+					}
+				}
+			});
+		}
+		else $('#msg').text("Email is not right!");
+	}
+  
+});
+</script>
+</head>
+<body>
+<div style="margin:0px auto;width:738px;height:45px;"><img src="/images/head.gif"></div>
+<div id="signin-box">
+	<div>
+		<form action="" id="siginin-form" autocomplete="off">
+			<fieldset style="border:0px">
+				<legend> Sign In</legend>
+				<label>SJSU Email</label>
+				<input name="sjsueml" id="sjsueml" class="forminput" type="text" tabindex="1">
+				<label>Password</label>
+				<input name="password" id="password" type="password" class="forminput" autocomplete="off" tabindex="2">
+				<input type="submit" style="position:absolute; top:-1000px">				
+			</fieldset>
+		</form>		
+		<div style="width:120px; margin:0 auto;"><button id="signin-button">Sign In</button></div>
+	</div>
+	<div id="help-links">
+		<a href="http://its.sjsu.edu/services/sjsuone/">Forgot password?</a>
+	</div>
+</div>
+<div id="msg"></div>
+</body>
+</html>

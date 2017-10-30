@@ -28,8 +28,14 @@ app.locals={
 MongoClient.connect(app.locals.dburl, function(err, db){
 	assert.equal(null, err);
 	console.log("Connected successfully to database server");	
+	var _index = require('./routes/index');
+	app.use('/', _index);
 	var _login = require('./routes/login');
-	app.use('/', _login(db));
+	app.use('/login', _login(db));
+	var _user = require('./routes/user');
+	app.use('/user', _user(db));
+	var _admin = require('./routes/admin');
+	app.use('/admin', _admin(db));
 });
 
 var http = require('http');
