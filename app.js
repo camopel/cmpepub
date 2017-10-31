@@ -20,7 +20,7 @@ app.use(session({
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 app.locals={
-	port:'18080',
+	port:'8080',
 	dburl:'mongodb://pub:pub@130.65.159.30:27017/pub',
 	uploadDir:path.join(__dirname, 'upload/')
 };
