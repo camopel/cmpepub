@@ -6,7 +6,7 @@ module.exports =  function(db){
 			res.send({"redirect":"/view/login.html"});
 		}else{					
 			db.collection('users').findOne({'sjsuid':req.query.sjsuid},{'lastname':1,'firstname':1,'rank':1,'year':1},function(err,data){
-				if(err!=null) res.send({"success":"false","msg":err});
+				if(err!=null) res.send({"success":"false","msg":"can not find data"});
 				else{
 					res.send({"success":"true","data":{
 						"lastname":data.lastname,
@@ -28,7 +28,7 @@ module.exports =  function(db){
 				"year":req.body.year,
 				"updatetime":new Date()
 			}},{},function(err, r){
-				if(err!=null) res.send({"success":"false","msg":err});
+				if(err!=null) res.send({"success":"false","msg":"can not update user"});
 				else res.send({"success":"true"});
 			});	
 		}
@@ -65,20 +65,20 @@ module.exports =  function(db){
 			if(file.name && file.name.length>0){
 				file.mv(req.app.locals.uploadDir+pdfID+".pdf", function(err){
 					if(err!=null){						
-						res.send({"success":"false", "msg":err});
+						res.send({"success":"false", "msg":"fail to upload file"});
 						return;
 					} else {
 						item["pdfID"]=pdfID;
 						item["pdfName"]=file.name;
 						db.collection('journal').updateOne({"_id":itemID},{$set:item},{upsert:true},function(err, result){
-							if(err!=null) res.send({"success":"false","msg":err});
+							if(err!=null) res.send({"success":"false","msg":"fail to update database"});
 							else res.send({"success":"true"});
 						});
 					}
 				});
 			} else {
 				db.collection('journal').updateOne({"_id":itemID}, {$set:item},{upsert:true},function(err, result){
-					if(err!=null) res.send({"success":"false","msg":err});
+					if(err!=null) res.send({"success":"false","msg":"fail to update journal"});
 					else res.send({"success":"true"});
 				});
 			}
@@ -114,13 +114,13 @@ module.exports =  function(db){
 			if(file.name && file.name.length>0){
 				file.mv(req.app.locals.uploadDir+pdfID+".pdf", function(err){
 					if(err!=null){						
-						res.send({"success":"false", "msg":err});
+						res.send({"success":"false", "msg":"fail to upload file"});
 						return;
 					} else {
 						item["pdfID"]=pdfID;
 						item["pdfName"]=file.name;
 						db.collection('conference').updateOne({"_id":itemID},{$set:item},{upsert:true},function(err, result){
-							if(err!=null) res.send({"success":"false","msg":err});
+							if(err!=null) res.send({"success":"false","msg":"fail to update database"});
 							else res.send({"success":"true"});
 						});
 					}
@@ -153,7 +153,7 @@ module.exports =  function(db){
 			var ObjectID = require('mongodb').ObjectID;
 			var itemID = req.body.id.length>0 ? new ObjectID(req.body.id) : new ObjectID();
 			db.collection('thesis').updateOne({"_id":itemID}, {$set:item},{upsert:true},function(err, result){
-				if(err!=null) res.send({"success":"false","msg":err});
+				if(err!=null) res.send({"success":"false","msg":"fail to update database"});
 				else res.send({"success":"true"});
 			});
 		}
@@ -167,7 +167,7 @@ module.exports =  function(db){
 			var conference = [];
 			var thesis = [];
 			db.collection('journal').find({'sjsuid':req.query.sjsuid}).toArray(function(err,items){
-				if(err!=null) res.send({"success":"false","msg":err});
+				if(err!=null) res.send({"success":"false","msg":"fail to find data"});
 				else{
 					for(var i=0;i<items.length;i++){
 						var data = items[i];
@@ -184,7 +184,7 @@ module.exports =  function(db){
 					}
 					
 					db.collection('conference').find({'sjsuid':req.query.sjsuid}).toArray(function(err,items){
-						if(err!=null) res.send({"success":"false","msg":err});
+						if(err!=null) res.send({"success":"false","msg":"fail to find data"});
 						else{
 							for(var i=0;i<items.length;i++){
 								var data = items[i];
@@ -200,7 +200,7 @@ module.exports =  function(db){
 							}
 							
 							db.collection('thesis').find({'sjsuid':req.query.sjsuid}).toArray(function(err,items){
-								if(err!=null) res.send({"success":"false","msg":err});
+								if(err!=null) res.send({"success":"false","msg":"fail to find data"});
 								else{
 									for(var i=0;i<items.length;i++){
 										var data = items[i];
@@ -239,7 +239,7 @@ module.exports =  function(db){
 		}else{
 			var ObjectID = require('mongodb').ObjectID;
 			db.collection('journal').removeOne({"_id":new ObjectID(req.body.id)},{w:1},function(err, r){
-				if(err!=null) res.send({"success":"false","msg":err});
+				if(err!=null) res.send({"success":"false","msg":"fail to delete"});
 				else res.send({"success":"true"});
 			});
 		}
@@ -251,7 +251,7 @@ module.exports =  function(db){
 		}else{
 			var ObjectID = require('mongodb').ObjectID;
 			db.collection('conference').removeOne({"_id":new ObjectID(req.body.id)},{w:1},function(err, r){
-				if(err!=null) res.send({"success":"false","msg":err});
+				if(err!=null) res.send({"success":"false","msg":"fail to delete"});
 				else res.send({"success":"true"});
 			});
 		}
@@ -263,7 +263,7 @@ module.exports =  function(db){
 		}else{
 			var ObjectID = require('mongodb').ObjectID;
 			db.collection('thesis').removeOne({"_id":new ObjectID(req.body.id)},{w:1},function(err, r){
-				if(err!=null) res.send({"success":"false","msg":err});
+				if(err!=null) res.send({"success":"false","msg":"fail to delete"});
 				else res.send({"success":"true"});
 			});
 		}
@@ -275,7 +275,7 @@ module.exports =  function(db){
 		}else{
 			var ObjectID = require('mongodb').ObjectID;
 			db.collection('journal').findOne({'_id':new ObjectID(req.query.id)},{},function(err,data){
-				if(err!=null) res.send({"success":"false","msg":err});
+				if(err!=null) res.send({"success":"false","msg":"fail to find data"});
 				else res.send({"success":"true","data":data});	
 			});			
 		}
@@ -287,7 +287,7 @@ module.exports =  function(db){
 		}else{
 			var ObjectID = require('mongodb').ObjectID;
 			db.collection('conference').findOne({'_id':new ObjectID(req.query.id)},{},function(err,data){
-				if(err!=null) res.send({"success":"false","msg":err});
+				if(err!=null) res.send({"success":"false","msg":"fail to find data"});
 				else res.send({"success":"true","data":data});	
 			});			
 		}
@@ -299,7 +299,7 @@ module.exports =  function(db){
 		}else{
 			var ObjectID = require('mongodb').ObjectID;
 			db.collection('thesis').findOne({'_id':new ObjectID(req.query.id)},{},function(err,data){
-				if(err!=null) res.send({"success":"false","msg":err});
+				if(err!=null) res.send({"success":"false","msg":"fail to find data"});
 				else res.send({"success":"true","data":data});	
 			});			
 		}
