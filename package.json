@@ -13,6 +13,7 @@
     "express-fileupload": "0.0.5",
     "express-session": "~1.14.1",
     "ldapjs": "1.0.1",
+    "longjohn": "^0.2.12",
     "mongodb": "~2.2.10"
   }
 }

@@ -18,7 +18,31 @@ function getCookie(name) {
 $(function(){
 	if(document.cookie.indexOf('sjsuid')==-1) window.location.href="/view/login.html";
 	var sjsuid = getCookie('sjsuid');
-	
+	$("#firstTime").change(function(){
+		// $("#firstTimeYes").find("input").val("");
+		// $("#firstTimeNo").find("input").val("");
+		if($("#firstTime").val()=="Yes"){
+			$("#firstTimeYes").show();
+			$("#firstTimeNo").hide();
+			// $('#firstTimeYes input').attr('required', true);
+			// $('#firstTimeNo input').removeAttr('required');
+		}else{
+			// $('#firstTimeNo input').attr('required', true);
+			// $('#firstTimeYes input').removeAttr('required');
+			$("#firstTimeNo").show();
+			$("#firstTimeYes").hide();
+		}
+	});
+	$("#firstTimeShared").change(function(){
+		$("#sharedYes").find("input").val("");
+		if($("#firstTimeShared").val()=="Yes"){
+			$("#sharedYes").show();
+			$('#sharedYes input').attr('required', true);
+		}else{
+			$('#sharedYes input').removeAttr('required');
+			$("#sharedYes").hide();
+		}
+	});
 	$("#pubOnline").change(function(){
 		$("#pubOnlineGroup").find("input").val("");
 		if($("#pubOnline").val()=="Yes"){
@@ -29,26 +53,26 @@ $(function(){
 			$("#pubOnlineGroup").hide();
 		}
 	});
-	$("#journalPaperPub").change(function(){
-		$("#journalPubListGroup").find("input").val("");
-		if($("#journalPaperPub").val()=="Yes"){
-			$("#journalPubListGroup").show();
-			$('#journalPubListGroup input').attr('required', true);
-		}else{
-			$('#journalPubListGroup input').removeAttr('required');
-			$("#journalPubListGroup").hide();
-		}
-	});
-	$("#confPaperPub").change(function(){
-		$("#confPubListGroup").find("input").val("");
-		if($("#confPaperPub").val()=="Yes"){
-			$("#confPubListGroup").show();
-			$('#confPubListGroup input').attr('required', true);
-		}else{
-			$("#confPubListGroup").hide();
-			$('#confPubListGroup input').removeAttr('required');
-		}
-	});	
+	// $("#journalPaperPub").change(function(){
+	// 	$("#journalPubListGroup").find("input").val("");
+	// 	if($("#journalPaperPub").val()=="Yes"){
+	// 		$("#journalPubListGroup").show();
+	// 		$('#journalPubListGroup input').attr('required', true);
+	// 	}else{
+	// 		$('#journalPubListGroup input').removeAttr('required');
+	// 		$("#journalPubListGroup").hide();
+	// 	}
+	// });
+	// $("#confPaperPub").change(function(){
+	// 	$("#confPubListGroup").find("input").val("");
+	// 	if($("#confPaperPub").val()=="Yes"){
+	// 		$("#confPubListGroup").show();
+	// 		$('#confPubListGroup input').attr('required', true);
+	// 	}else{
+	// 		$("#confPubListGroup").hide();
+	// 		$('#confPubListGroup input').removeAttr('required');
+	// 	}
+	// });	
 	var jf = $('.upload').filer({
 		showThumbs: true,
 		addMore: true,
@@ -82,6 +106,29 @@ $(function(){
 		});
 	});
 	
+	$("#research_grants form").submit(function(e) {
+		e.preventDefault();
+		$("#research_grants #sjsuid").val(sjsuid);		
+		var formData = new FormData($(this)[0]);
+		$.ajax({
+			type: "POST",
+			url: "/user/addGrants",
+			data: formData,
+			contentType: false,
+			processData: false,
+			success: function(data){
+				if (data.redirect) window.location.href = data.redirect;
+				else if(data.success=='false') alert(data.msg);
+				else{
+					$("#research_grants form")[0].reset();
+					var filerKit = $('#research_grants .upload').prop("jFiler");
+					filerKit.reset();
+					alert("Thanks for submitting the form! You can go to My Submissions to modify your submissions.");
+				}
+			}
+		});
+	});
+
 	$("#tab2 form").submit(function(e) {
 		e.preventDefault();
 		$("#tab2 #sjsuid").val(sjsuid);		
@@ -99,7 +146,7 @@ $(function(){
 					$("#tab2 form")[0].reset();
 					var filerKit = $('#tab2 .upload').prop("jFiler");
 					filerKit.reset();
-					alert("success!");
+					alert("Thanks for submitting the form! You can go to My Submissions to modify your submissions.");
 				}
 			}
 		});
@@ -122,7 +169,7 @@ $(function(){
 					$("#tab3 form")[0].reset();
 					var filerKit = $('#tab3 .upload').prop("jFiler");
 					filerKit.reset();
-					alert("success!");
+					alert("Thanks for submitting the form! You can go to My Submissions to modify your submissions.");
 				}
 			}
 		});
@@ -143,11 +190,44 @@ $(function(){
 				else if(data.success=='false') alert(data.msg);
 				else{
 					$("#tab4 form")[0].reset();					
-					alert("success!");
+					alert("Thanks for submitting the form! You can go to My Submissions to modify your submissions.");
 				}
 			}
 		});
 	});
+
+	function grantsClick(e){
+		var _id = $(e.target).parent().parent().attr("id");
+		var action = $(e.target).html();
+		var pdfID = $(e.target).attr("id");
+		if(action=="Download"){
+			//$("#pubType").val("journal");
+			//$("#pubID").val(_id);			
+			$("#pdfID").val(pdfID);
+			$("#downloadForm").attr("action",'/user/download').submit();			
+		} else if(action=="Edit"){
+			$("#research_grants #id").val(_id);
+			$('.nav-tabs a[href="#research_grants"]').tab('show');
+		} else if (confirm("Want to delete?")){
+			$.ajax({
+				url: "/user/grants",
+				type: 'delete',
+				data: 'sjsuid='+sjsuid+"&id="+_id,
+				success: function (data) {
+					if (data.redirect) window.location.href = data.redirect;
+					else if(data.success=='false') alert(data.msg);
+					else{
+						//$('.nav-tabs a[href="#tab5"]').tab('show');
+						onLoadTab5();
+					}
+				},
+				error: function(error) { 
+					alert('Error!'+error);
+				} 
+			});
+		}
+	}
+
 	function journalClick(e){
 		var _id = $(e.target).parent().parent().attr("id");
 		var action = $(e.target).html();
@@ -160,7 +240,7 @@ $(function(){
 		} else if(action=="Edit"){
 			$("#tab2 #id").val(_id);
 			$('.nav-tabs a[href="#tab2"]').tab('show');
-		} else {
+		} else if (confirm("Want to delete?")){
 			$.ajax({
 				url: "/user/journal",
 				type: 'delete',
@@ -189,7 +269,7 @@ $(function(){
 		} else if(action=="Edit"){
 			$("#tab3 #id").val(_id);
 			$('.nav-tabs a[href="#tab3"]').tab('show');
-		} else {
+		} else if (confirm("Want to delete?")){
 			$.ajax({
 				url: "/user/conference",
 				type: 'delete',
@@ -214,7 +294,7 @@ $(function(){
 		if(action=="Edit"){
 			$("#tab4 #id").val(_id);
 			$('.nav-tabs a[href="#tab4"]').tab('show');
-		} else {
+		} else if (confirm("Want to delete?")){
 			$.ajax({
 				url: "/user/thesis",
 				type: 'delete',
@@ -236,6 +316,7 @@ $(function(){
 	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		var target = $(e.target).attr("href");
 		if (target == '#tab1') onLoadTab1();
+		else if (target == '#research_grants') onLoadResearchGrants();
 		else if (target == '#tab2') onLoadTab2();
 		else if (target == '#tab3') onLoadTab3();
 		else if (target == '#tab4') onLoadTab4();
@@ -262,6 +343,59 @@ $(function(){
 			} 
 		});
 	}
+	function onLoadResearchGrants(){
+		var id = $("#research_grants #id").val().trim();
+		if(id=="") return;
+		$.ajax({
+			url: "/user/grants",
+			type: 'get',
+			data: 'sjsuid='+sjsuid+"&id="+id,
+			success: function (data) {
+				if (data.redirect) window.location.href = data.redirect;
+				else if(data.success=='false') alert(data.msg);
+				else{
+					var data = data.data;
+					$("#research_grants #grantTitle").val(data.grantTitle);
+					$("#research_grants #fundingAgency").val(data.fundingAgency);
+					$("#research_grants #copisList").val(data.copisList);
+					$("#research_grants #institutions").val(data.institutions);
+					$("#research_grants #firstTime").val(data.firstTime);
+					$("#research_grants #firstTimeStartDate").val(data.firstTimeStartDate);
+					$("#research_grants #firstTimeEndDate").val(data.firstTimeEndDate);
+					$("#research_grants #firstTimeTotalAward").val(data.firstTimeTotalAward);
+					$("#research_grants #firstTimeRateCharged").val(data.firstTimeRateCharged);
+					$("#research_grants #firstTimeShared").val(data.firstTimeShared);
+					$("#research_grants #firstTimeTotalFunding").val(data.firstTimeTotalFunding);
+					$("#research_grants #totalAward").val(data.totalAward);
+					$("#research_grants #amountInvoked").val(data.amountInvoked);
+					$("#research_grants #yearsInvoked").val(data.yearsInvoked);
+					$("#research_grants #balanceAvailable").val(data.balanceAvailable);
+					$("#research_grants #endDate").val(data.endDate);
+					if(data.firstTime=="Yes"){
+						$("#firstTimeYes").show();
+						$("#firstTimeNo").hide();
+						// $('#firstTimeYes input').attr('required', true);
+						// $('#firstTimeNo input').removeAttr('required');
+					}else{
+						// $('#firstTimeNo input').attr('required', true);
+						// $('#firstTimeYes input').removeAttr('required');
+						$("#firstTimeNo").show();
+						$("#firstTimeYes").hide();
+					}
+					if(data.firstTimeShared=="Yes"){
+						$("#sharedYes").show();
+						$('#sharedYes input').attr('required', true);
+					}else{
+						$('#sharedYes input').removeAttr('required');
+						$("#sharedYes").hide();
+					}
+				}
+			},
+			error: function(error) { 
+				alert('Error!'+error);
+			} 
+		});
+	}
 	function onLoadTab2(){
 		var id = $("#tab2 #id").val().trim();
 		if(id=="") return;
@@ -281,12 +415,17 @@ $(function(){
 					$("#tab2 #correspondingAuthor").val(data.correspondingAuthor);
 					$("#tab2 #journalTitle").val(data.journalTitle);
 					$("#tab2 #journalURL").val(data.journalURL);
-					$("#tab2 #pubMonthYear").val(data.pubMonthYear);
+					$("#tab2 #pubYear").val(data.pubYear);
+					$("#tab2 #pubMonth").val(data.pubMonth);
+					$("#tab2 #journalVolumeNumber").val(data.journalVolumeNumber);
 					$("#tab2 #issueNumber").val(data.issueNumber);
 					$("#tab2 #pagesNumber").val(data.pagesNumber);
+					$("#tab2 #doi").val(data.doi);
 					$("#tab2 #impactFactor").val(data.impactFactor);
+					$("#tab2 #impactRate").val(data.impactRate);
 					$("#tab2 #pubOnline").val(data.pubOnline);
-					$("#tab2 #monthYearOnline").val(data.monthYearOnline);
+					$("#tab2 #yearOnline").val(data.yearOnline);
+					$("#tab2 #monthOnline").val(data.monthOnline);
 					$("#tab2 #urlOnline").val(data.urlOnline);
 					if(data.pubOnline=="Yes"){
 						$("#pubOnlineGroup").show();
@@ -318,14 +457,19 @@ $(function(){
 					$("#tab3 #authors").val(data.authors);
 					$("#tab3 #affiliation").val(data.affiliation);
 					$("#tab3 #coauthors").val(data.coauthors);
+					$("#tab3 #isCorrespondingAuthor").val(data.isCorrespondingAuthor);
 					$("#tab3 #conferenceTitle").val(data.conferenceTitle);
-					$("#tab3 #location").val(data.location);
-					$("#tab3 #heldDate").val(data.heldDate);
+					$("#tab3 #locationHeld").val(data.locationHeld);
+					$("#tab3 #conferenceYear").val(data.conferenceYear);
+					$("#tab3 #conferenceMonth").val(data.conferenceMonth);
+					$("#tab3 #conferenceDays").val(data.conferenceDays);
 					$("#tab3 #conferenceDomain").val(data.conferenceDomain);
 					$("#tab3 #sponsor").val(data.sponsor);
 					$("#tab3 #reviewed").val(data.reviewed);
 					$("#tab3 #pubRange").val(data.pubRange);
-					$("#tab3 #urlOnline").val(data.urlOnline);			
+					$("#tab3 #conferencePagesNumber").val(data.conferencePagesNumber);
+					$("#tab3 #urlOnline").val(data.urlOnline);
+					$("#tab3 #conferenceAcceptanceRate").val(data.conferenceAcceptanceRate);		
 				}
 			},
 			error: function(error) { 
@@ -348,27 +492,30 @@ $(function(){
 					$("#tab4 #title").val(data.title);
 					$("#tab4 #student").val(data.student);
 					$("#tab4 #department").val(data.department);
-					$("#tab4 #completeDate").val(data.completeDate);
+					$("#tab4 #yearAccepted").val(data.yearAccepted);
+					$("#tab4 #monthAccepted").val(data.monthAccepted);
+					$("#tab4 #thesesRole").val(data.thesesRole);
 					$("#tab4 #journalPaperPub").val(data.journalPaperPub);
-					$("#tab4 #journalPubList").val(data.journalPubList);
+					// $("#tab4 #journalPubList").val(data.journalPubList);
 					$("#tab4 #confPaperPub").val(data.confPaperPub);
-					$("#tab4 #confPubList").val(data.confPubList);	
+					// $("#tab4 #confPubList").val(data.confPubList);	
+					$("#tab4 #thesesURL").val(data.thesesURL);
 				
-					if(data.journalPaperPub=="Yes"){
-						$("#journalPubListGroup").show();
-						$('#journalPubListGroup input').attr('required', true);
-					}else{
-						$('#journalPubListGroup input').removeAttr('required');
-						$("#journalPubListGroup").hide();
-					}
+					// if(data.journalPaperPub=="Yes"){
+					// 	$("#journalPubListGroup").show();
+					// 	$('#journalPubListGroup input').attr('required', true);
+					// }else{
+					// 	$('#journalPubListGroup input').removeAttr('required');
+					// 	$("#journalPubListGroup").hide();
+					// }
 					
-					if(data.confPaperPub=="Yes"){
-						$("#confPubListGroup").show();
-						$('#confPubListGroup input').attr('required', true);
-					}else{
-						$("#confPubListGroup").hide();
-						$('#confPubListGroup input').removeAttr('required');
-					}
+					// if(data.confPaperPub=="Yes"){
+					// 	$("#confPubListGroup").show();
+					// 	$('#confPubListGroup input').attr('required', true);
+					// }else{
+					// 	$("#confPubListGroup").hide();
+					// 	$('#confPubListGroup input').removeAttr('required');
+					// }
 				}
 			},
 			error: function(error) { 
@@ -377,6 +524,7 @@ $(function(){
 		});		
 	}
 	function onLoadTab5(){
+		$("#grantsTbody").empty();
 		$("#journalTbody").empty();
 		$("#conferenceTbody").empty();
 		$("#thesisTbody").empty();
@@ -388,9 +536,16 @@ $(function(){
 				if (data.redirect) window.location.href = data.redirect;
 				else if(data.success=='false') alert(data.msg);
 				else{
+					var grants = data.data.grants;
 					var jnl = data.data.journal;
 					var conf = data.data.conference;
 					var thesis = data.data.thesis;
+					grants.forEach(function(e) {
+						var pdf = e.pdfID==""?"":"<a id='"+e.pdfID+"'>Download</a>";				
+						$("#grantsTbody").append("<tr id='"+e.id+"'><td>"+e.grantTitle+"</td><td>"+e.fundingAgency+"</td><td>"+e.copisList+"</td><td>"+pdf+"</td><td><a>Edit</a><a style='margin-left:10px'>Delete</a></td></tr>");
+					});
+					$("#grantsTbody tr td a").click(grantsClick);
+
 					jnl.forEach(function(e) {
 						var pdf = e.pdfID==""?"":"<a id='"+e.pdfID+"'>Download</a>";				
 						$("#journalTbody").append("<tr id='"+e.id+"'><td>"+e.title+"</td><td>"+e.authors+"</td><td>"+e.journalTitle+"</td><td>"+e.pubMonthYear+"</td><td>"+e.impactFactor+"</td><td>"+e.pubOnline+"</td><td>"+pdf+"</td><td><a>Edit</a><a style='margin-left:10px'>Delete</a></td></tr>");
@@ -404,7 +559,8 @@ $(function(){
 					$("#conferenceTbody tr td a").click(conferenceClick);
 					
 					thesis.forEach(function(e) {
-						$("#thesisTbody").append("<tr id='"+e.id+"'><td>"+e.title+"</td><td>"+e.student+"</td><td>"+e.department+"</td><td>"+e.completeDate+"</td><td>"+e.journalPubList+"</td><td>"+e.confPubList+"</td><td><a>Edit</a><a style='margin-left:10px'>Delete</a></td></tr>");
+						var pdf = e.pdfID==""?"":"<a id='"+e.pdfID+"'>Download</a>";
+						$("#thesisTbody").append("<tr id='"+e.id+"'><td>"+e.title+"</td><td>"+e.student+"</td><td>"+e.department+"</td><td>"+e.yearAccepted+"</td><td>"+pdf+"</td><td><a>Edit</a><a style='margin-left:10px'>Delete</a></td></tr>");
 					});
 					$("#thesisTbody tr td a").click(thesisClick);
 				}
@@ -417,6 +573,22 @@ $(function(){
 	onLoadTab1();
 });
 
+function clearGrants(){
+	$("#research_grants form")[0].reset();
+	var filerKit = $('#research_grants .upload').prop("jFiler");
+	filerKit.reset();
+		if($("#firstTime").val()=="Yes"){
+			$("#firstTimeYes").show();
+			$("#firstTimeNo").hide();
+			// $('#firstTimeYes input').attr('required', true);
+			// $('#firstTimeNo input').removeAttr('required');
+		}else{
+			// $('#firstTimeNo input').attr('required', true);
+			// $('#firstTimeYes input').removeAttr('required');
+			$("#firstTimeNo").show();
+			$("#firstTimeYes").hide();
+		}
+}
 
 function clearJournal(){
 	$("#tab2 form")[0].reset();
@@ -437,21 +609,21 @@ function clearConference(){
 }
 function clearThesis(){
 	$("#tab4 form")[0].reset();
-	if($("#journalPaperPub").val()=="Yes"){
-		$("#journalPubListGroup").show();
-		$('#journalPubListGroup input').attr('required', true);
-	}else{
-		$('#journalPubListGroup input').removeAttr('required');
-		$("#journalPubListGroup").hide();
-	}
+	// if($("#journalPaperPub").val()=="Yes"){
+	// 	$("#journalPubListGroup").show();
+	// 	$('#journalPubListGroup input').attr('required', true);
+	// }else{
+	// 	$('#journalPubListGroup input').removeAttr('required');
+	// 	$("#journalPubListGroup").hide();
+	// }
 	
-	if($("#confPaperPub").val()=="Yes"){
-		$("#confPubListGroup").show();
-		$('#confPubListGroup input').attr('required', true);
-	}else{
-		$("#confPubListGroup").hide();
-		$('#confPubListGroup input').removeAttr('required');
-	}
+	// if($("#confPaperPub").val()=="Yes"){
+	// 	$("#confPubListGroup").show();
+	// 	$('#confPubListGroup input').attr('required', true);
+	// }else{
+	// 	$("#confPubListGroup").hide();
+	// 	$('#confPubListGroup input').removeAttr('required');
+	// }
 }
 </script>
 </head>
@@ -462,10 +634,11 @@ function clearThesis(){
 	<h5><a href="/login/logout" style="float:right">Logout</a></h5>
 	<ul class="nav nav-tabs" style="font-weight:bold">
 		<li class="active"><a data-toggle="tab" href="#tab1">Personal Information</a></li>
-		<li><a data-toggle="tab" href="#tab2">Reviewed Journal Publications</a></li>
-		<li><a data-toggle="tab" href="#tab3">Reviewed Conference Publication</a></li>
-		<li><a data-toggle="tab" href="#tab4">MS Thesis Supervised</a></li>
-		<li><a data-toggle="tab" href="#tab5">My Submission</a></li>
+		<li><a data-toggle="tab" href="#research_grants">Research Grants</a></li>
+		<li><a data-toggle="tab" href="#tab2">Journal Publications</a></li>
+		<li><a data-toggle="tab" href="#tab3">Conference Publications</a></li>
+		<li><a data-toggle="tab" href="#tab4">M.S. Theses Supervised</a></li>
+		<li><a data-toggle="tab" href="#tab5">My Submissions</a></li>
 	</ul>
 	<div class="tab-content" style="padding:15px">
 		<div id="tab1" class="tab-pane fade in active">
@@ -485,21 +658,158 @@ function clearThesis(){
 				</div>
 				<div class="form-group">
 					<label for="rank" class="control-label col-sm-2">Present Rank:</label>
-					<div class="col-sm-10">
-						<input type="number" class="form-control" name="rank" id="rank" placeholder="Present Rank" required>
+					<div class="col-sm-10">						
+						<select class="form-control" name="rank" id="rank" required>
+							<option value="Professor">Professor</option>
+							<option value="Associate Professor">Associate Professor</option>
+							<option value="Assistant Professor">Assistant Professor</option>
+						</select>
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="year" class="control-label col-sm-2">Year Joined SJSU:</label>
+					<label for="year" class="control-label col-sm-2">Date Joined SJSU: </label>
 					<div class="col-sm-10">
-						<input type="number" class="form-control" min="1900" max="2099" name="year" id="year" placeholder="yyyy" step="1" required>
+						<input type="text" class="form-control" name="year" id="year" placeholder="MM/YYYY" required>
 					</div>
 				</div>
 				<div style="text-align:center">
-					<button type="submit" class="submit btn btn-default">Update</button>
+					<button type="submit" onclick="return confirm('Cheers! Your personal infomation is updated!')" class="submit btn btn-default">Update</button>
 				</div>				
 			</form>
 		</div>
+		<div id="research_grants" class="tab-pane fade" >
+			<form class="form-horizontal" data-toggle="validator" role="form">
+				<input type="hidden" class="form-control" name="id" id="id">
+				<input type="hidden" class="form-control" name="sjsuid" id="sjsuid">
+				<div class="form-group">
+					<label for="grantTitle" class="control-label col-sm-2">Grant Title:</label>
+					<div class="col-sm-10">
+					<input type="text" class="form-control" name="grantTitle" id="grantTitle" placeholder="Grant Title" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="fundingAgency" class="control-label col-sm-2">Funding Agency:</label>
+					<div class="col-sm-10">
+					<input type="text" class="form-control" name="fundingAgency" id="fundingAgency" placeholder="Funding Agency" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="copisList" class="control-label col-sm-2">Ordered Listing of Co-PIs and Co-Is:</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" name="copisList" id="copisList" placeholder="Ordered Listing of Co-PIs and Co-Is" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="institutions" class="control-label col-sm-2" style="padding-top:0px">Ordered Listing of Their Institutions:</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" name="institutions" id="institutions" placeholder="Ordered Listing of Their Institutions" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="firstTime" class="control-label col-sm-2">Is This the First Time This Grant is Being Reported:</label>
+					<div class="col-sm-10">						
+						<select class="form-control" name="firstTime" id="firstTime" required>
+							<option value=""></option>
+							<option value="Yes">Yes</option>
+							<option value="No">No</option>													
+						</select>
+					</div>
+				</div>
+				<div id="firstTimeYes" style="display:none">
+					<div class="form-group">
+						<label for="firstTimeStartDate" class="control-label col-sm-2">Award Starting Date:</label>
+						<div class="col-sm-10">
+							<input type="date" class="form-control" name="firstTimeStartDate" id="firstTimeStartDate" placeholder="MM/DD/YYYY">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="firstTimeEndDate" class="control-label col-sm-2">Award Ending Date:</label>
+						<div class="col-sm-10">
+							<input type="date" class="form-control" name="firstTimeEndDate" id="firstTimeEndDate" placeholder="MM/DD/YYYY">
+						</div>		
+					</div>
+					<div class="form-group">
+						<label for="firstTimeTotalAward" class="control-label col-sm-2">Total Award Amount:</label>
+						<div class="col-sm-10">
+							<input type="number" class="form-control" name="firstTimeTotalAward" id="firstTimeTotalAward" placeholder="0.00" step=".01">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="firstTimeRateCharged" class="control-label col-sm-2">F&A Rate Charged(%):</label>
+						<div class="col-sm-10">
+							<input type="number" class="form-control" name="firstTimeRateCharged" id="firstTimeRateCharged" placeholder="100.00" step=".01">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="firstTimeShared" class="control-label col-sm-2">Is Credit for the Award Amount Shared?</label>
+						<div class="col-sm-10">						
+							<select class="form-control" name="firstTimeShared" id="firstTimeShared" required>
+								<option value="Yes">If Yes, Please Upload Agreed To Amount Attributed to Each Co-PI and Co-I</option>
+								<option value="No" selected="">No</option>													
+							</select>
+						</div>
+					</div>
+					<div id="sharedYes" style="display:none">
+						<div class="form-group">
+							<label for="firstTimeTotalFunding" class="control-label col-sm-2">Amount of the Total Funding Attributed to You:</label>
+							<div class="col-sm-10">
+								<input type="number" class="form-control" name="firstTimeTotalFunding" id="firstTimeTotalFunding" placeholder="0.00" step=".01">
+							</div>
+						</div>	
+						<div class="form-group">
+							<label for="grantAwardPDF" class="control-label col-sm-2">Please Upload PDF Copy of the Official Grant Award letter Received by the SJSURF:</label>
+							<div class="col-sm-10">
+								<input type="file" class="upload" name="grantAwardPDF" id="grantAwardPDF" accept=".pdf">
+							</div>
+						</div>	
+						<div class="form-group">
+							<label for="grantBudgePDF" class="control-label col-sm-2">Please Upload PDF Copy of the Official Grant Budge Approved by the SJSURF:</label>
+							<div class="col-sm-10">
+								<input type="file" class="upload" name="grantBudgePDF" id="grantBudgePDF" accept=".pdf">
+							</div>
+							<label>Please Upload pdf Copy of the Published Version. Upload both files at the same time to avoid an error message.<br> If you have already uploaded a file for current update and want to keep it, please leave the field blank.<br>To check all your uploaded files, please go to My Submissions. Much appreciated! </label>
+						</div>	
+					</div>
+				</div>	
+				<div id="firstTimeNo" style="display:none">
+					<div class="form-group">
+						<label for="totalAward" class="control-label col-sm-2">Amount of the Total Award Attributed to You:</label>
+						<div class="col-sm-10">
+							<input type="number" class="form-control" name="totalAward" id="totalAward" placeholder="0.00" step=".01">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="amountInvoked" class="control-label col-sm-2">Amount Already Invoked For Release-Time in Past Academic Years:</label>
+						<div class="col-sm-10">
+							<input type="number" class="form-control" name="amountInvoked" id="amountInvoked" placeholder="0.00" step=".01">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="yearsInvoked" class="control-label col-sm-2">Academic Years Invoked:</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" name="yearsInvoked" id="yearsInvoked" placeholder="Academic Years Invoked">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="balanceAvailable" class="control-label col-sm-2">Balance Available to Invoke for Release-Time :</label>
+						<div class="col-sm-10">
+							<input type="number" class="form-control" name="balanceAvailable" id="balanceAvailable" placeholder="0.00" step=".01">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="endDate" class="control-label col-sm-2">Award Ending Date:</label>
+						<div class="col-sm-10">
+							<input type="date" class="form-control" name="endDate" id="endDate" placeholder="MM/DD/YYYY">
+						</div>		
+					</div>
+				</div>
+				<div style="text-align:center">
+					<button class="btn btn-default" onclick="clearGrants()">Clear</button>
+					<button type="submit" class="btn btn-default">Submit</button>
+				</div>				
+			</form>
+		</div>
+
 		<div id="tab2" class="tab-pane fade" >
 			<form class="form-horizontal" data-toggle="validator" role="form">
 				<input type="hidden" class="form-control" name="id" id="id">
@@ -511,27 +821,30 @@ function clearThesis(){
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="authors" class="control-label col-sm-2">Ordered Authors List:</label>
+					<label for="authors" class="control-label col-sm-2">Ordered Authors:</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" name="authors" id="authors" placeholder="Ordered Authors List" required>
+						<input type="text" class="form-control" name="authors" id="authors" placeholder="Ordered Authors" required>
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="affiliations" class="control-label col-sm-2" style="padding-top:0px">Ordered Authors Affiliations:</label>
+					<label for="affiliation" class="control-label col-sm-2" style="padding-top:0px">Ordered Authors Affiliations:</label>
 					<div class="col-sm-10">
 						<input type="text" class="form-control" name="affiliation" id="affiliation" placeholder="Ordered Authors Affiliations" required>
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="coauthors" class="control-label col-sm-2" style="padding-top:0px">List SJSU Student Coauthors:</label>
+					<label for="coauthors" class="control-label col-sm-2" style="padding-top:0px">Names of SJSU Student Coauthors:</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" name="coauthors" id="coauthors" placeholder="List SJSU Student Coauthors" required>
+						<input type="text" class="form-control" name="coauthors" id="coauthors" placeholder="Names of SJSU Student Coauthors">
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="correspondingAuthor" class="control-label col-sm-2">Corresponding Author:</label>
-					<div class="col-sm-10">
-						<input type="text" class="form-control" name="correspondingAuthor" id="correspondingAuthor" placeholder="Corresponding Author" required>
+					<label for="correspondingAuthor" class="control-label col-sm-2">Are you the Corresponding Author? (See Definition in the Guidelines):</label>
+					<div class="col-sm-10">						
+						<select class="form-control" name="correspondingAuthor" id="correspondingAuthor" required>
+							<option value="Yes">Yes</option>
+							<option value="No" selected="">No</option>													
+						</select>
 					</div>
 				</div>
 				<div class="form-group">
@@ -543,13 +856,25 @@ function clearThesis(){
 				<div class="form-group">
 					<label for="journalURL" class="control-label col-sm-2">Journal URL:</label>
 					<div class="col-sm-10">
-						<input type="url" class="form-control" name="journalURL" id="journalURL" placeholder="Journal URL" required>
+						<input type="url" class="form-control" name="journalURL" id="journalURL" placeholder="http://url.com">
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="pubMonthYear" class="control-label col-sm-2" style="padding-top:0px">Month & Year Published in Print:</label>
+					<label for="pubYear" class="control-label col-sm-2" style="padding-top:0px">Year Published in Print:</label>
 					<div class="col-sm-10">
-						<input type="month" class="form-control" name="pubMonthYear" id="pubMonthYear" required>
+						<input type="text" class="form-control" name="pubYear" id="pubYear" placeholder="YYYY" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="pubMonth" class="control-label col-sm-2" style="padding-top:0px">Month Published in Print:</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" name="pubMonth" id="pubMonth" placeholder="January, February, …" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="journalVolumeNumber" class="control-label col-sm-2" style="padding-top:0px">Journal Volume Number:</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" name="journalVolumeNumber" id="journalVolumeNumber" placeholder="Journal Volume Number" required>
 					</div>
 				</div>
 				<div class="form-group">
@@ -559,9 +884,15 @@ function clearThesis(){
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="pagesNumber" class="control-label col-sm-2">Pages Number:</label>
+					<label for="pagesNumber" class="control-label col-sm-2">First-Last Page Number:</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" name="pagesNumber" id="pagesNumber" placeholder="Pages Number" required>
+						<input type="text" class="form-control" name="pagesNumber" id="pagesNumber" placeholder="First-Last Page Number" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="doi" class="control-label col-sm-2">DOI (if available):</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" name="doi" id="doi" placeholder="DOI">
 					</div>
 				</div>
 				<div class="form-group">
@@ -571,7 +902,13 @@ function clearThesis(){
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="pubOnline" class="control-label col-sm-2">Published Online:</label>
+						<label for="impactRate" class="control-label col-sm-2">Journal Papers Acceptance Rate(%)(if Known):</label>
+						<div class="col-sm-10">
+							<input type="number" class="form-control" name="impactRate" id="impactRate" placeholder="100.00" step=".01">
+						</div>
+					</div>
+				<div class="form-group">
+					<label for="pubOnline" class="control-label col-sm-2">Also Published online?</label>
 					<div class="col-sm-10">						
 						<select class="form-control" name="pubOnline" id="pubOnline" required>
 							<option value="Yes">Yes</option>
@@ -581,23 +918,30 @@ function clearThesis(){
 				</div>
 				<div id="pubOnlineGroup" style="display:none">
 					<div class="form-group">
-						<label for="monthYearOnline" class="control-label col-sm-2" style="padding-top:0px">Month Appeared Online:</label>
+						<label for="yearOnline" class="control-label col-sm-2" style="padding-top:0px">Year Appeared Online:</label>
 						<div class="col-sm-10">
-							<input type="month" class="form-control" name="monthYearOnline" id="monthYearOnline">
+							<input type="text" class="form-control" name="yearOnline" id="yearOnline" placeholder="YYYY">
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="urlOnline" class="control-label col-sm-2" style="padding-top:0px">URL of Online Publication:</label>
+						<label for="monthOnline" class="control-label col-sm-2" style="padding-top:0px">Month Appeared Online:</label>
 						<div class="col-sm-10">
-							<input type="url" class="form-control" name="urlOnline" id="urlOnline" placeholder="URL of Online Publication">
+							<input type="text" class="form-control" name="monthOnline" id="monthOnline" placeholder="January, February, …">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="urlOnline" class="control-label col-sm-2" style="padding-top:0px">URL of Online Text of the Paper:</label>
+						<div class="col-sm-10">
+							<input type="url" class="form-control" name="urlOnline" id="urlOnline" placeholder="http://url.com">
 						</div>
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="pdf" class="control-label col-sm-2">PDF Upload:</label>
+					<label for="pdf" class="control-label col-sm-2">Comments, if any (Best Paper Award, Top-Ranked Journal, Invited Presentation, …):</label>
 					<div class="col-sm-10">
 						<input type="file" class="upload" name="pdf" id="pdf" accept=".pdf">
 					</div>
+					<label>Please Upload pdf Copy of the Published Version.<br> If you have already uploaded a file for current update and want to keep it, please leave the field blank.<br>To check all your uploaded files, please go to My Submissions. Much appreciated! </label>
 				</div>				
 				<div style="text-align:center">
 					<button class="btn btn-default" onclick="clearJournal()">Clear</button>
@@ -616,21 +960,30 @@ function clearThesis(){
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="authors" class="control-label col-sm-2">Ordered Authors List:</label>
+					<label for="authors" class="control-label col-sm-2">Ordered Authors:</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" name="authors" id="authors" placeholder="Ordered Authors List" required>
+						<input type="text" class="form-control" name="authors" id="authors" placeholder="OOrdered Authors" required>
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="affiliations" class="control-label col-sm-2" style="padding-top:0px">Ordered Authors Affiliations:</label>
+					<label for="affiliation" class="control-label col-sm-2" style="padding-top:0px">Ordered Authors Affiliations:</label>
 					<div class="col-sm-10">
 						<input type="text" class="form-control" name="affiliation" id="affiliation" placeholder="Ordered Authors Affiliations" required>
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="coauthors" class="control-label col-sm-2" style="padding-top:0px">List SJSU Student Coauthors:</label>
+					<label for="coauthors" class="control-label col-sm-2" style="padding-top:0px">Names of SJSU Student Coauthors:</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" name="coauthors" id="coauthors" placeholder="List SJSU Student Coauthors" required>
+						<input type="text" class="form-control" name="coauthors" id="coauthors" placeholder="Names of SJSU Student Coauthors">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="isCorrespondingAuthor" class="control-label col-sm-2">Are you the Corresponding Author? (See Definition in the Guidelines):</label>
+					<div class="col-sm-10">						
+						<select class="form-control" name="isCorrespondingAuthor" id="isCorrespondingAuthor" required>
+							<option value="Yes">Yes</option>
+							<option value="No" selected>No</option>													
+						</select>
 					</div>
 				</div>
 				<div class="form-group">
@@ -640,17 +993,29 @@ function clearThesis(){
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="location" class="control-label col-sm-2" style="padding-top:0px">Location Held(City, State, Country):</label>
+					<label for="locationHeld" class="control-label col-sm-2" style="padding-top:0px">Location Held (City, State/Country):</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" name="location" id="location" placeholder="Location Held" required>
+						<input type="text" class="form-control" name="locationHeld" id="locationHeld" placeholder="Location Held" required>
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="date" class="control-label col-sm-2">Held Date:</label>
+					<label for="conferenceYear" class="control-label col-sm-2" style="padding-top:0px">Year:</label>
 					<div class="col-sm-10">
-						<input type="date" class="form-control" name="heldDate" id="heldDate" placeholder="mm/dd/yyyy" required>
+						<input type="text" class="form-control" name="conferenceYear" id="conferenceYear" placeholder="YYYY" required>
 					</div>
-				</div>				
+				</div>
+				<div class="form-group">
+					<label for="conferenceMonth" class="control-label col-sm-2" style="padding-top:0px">Month:</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" name="conferenceMonth" id="conferenceMonth" placeholder="Junuary, February, …" required>
+					</div>
+				</div>		
+				<div class="form-group">
+					<label for="conferenceDays" class="control-label col-sm-2" style="padding-top:0px">Days:</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" name="conferenceDays" id="conferenceDays" placeholder="DD to DD" required>
+					</div>
+				</div>	
 				<div class="form-group">
 					<label for="conferenceDomain" class="control-label col-sm-2" style="padding-top:0px">National/International Conference:</label>
 					<div class="col-sm-10">
@@ -663,7 +1028,7 @@ function clearThesis(){
 				<div class="form-group">
 					<label for="sponsor" class="control-label col-sm-2" style="padding-top:0px">Sponsoring Professional Organization(s):</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" name="sponsor" id="sponsor" placeholder="Sponsoring Professional Organization(s)" required>
+						<input type="text" class="form-control" name="sponsor" id="sponsor" placeholder="Sponsoring Professional Organization(s)">
 					</div>
 				</div>
 				<div class="form-group">
@@ -676,25 +1041,38 @@ function clearThesis(){
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="pubRange" class="control-label col-sm-2" style="padding-top:0px">Full Text or Abstract Published:</label>
+					<label for="pubRange" class="control-label col-sm-2" style="padding-top:0px">Full Text of Paper Published in Conference Proceedings?</label>
 					<div class="col-sm-10">
 						<select class="form-control" name="pubRange" id="pubRange" required>
 							<option value="FullText" selected>Full Text</option>
 							<option value="Abstract">Abstract</option>									
 						</select>
 					</div>
-				</div>				
+				</div>
 				<div class="form-group">
-					<label for="urlOnline" class="control-label col-sm-2" style="padding-top:0px">URL to Conference Publication:</label>
+					<label for="conferencePagesNumber" class="control-label col-sm-2">First-Last Page Number in Conference Proceedings:</label>
 					<div class="col-sm-10">
-						<input type="url" class="form-control" name="urlOnline" id="urlOnline" placeholder="URL of Conference Publication" required>
+						<input type="text" class="form-control" name="conferencePagesNumber" id="conferencePagesNumber" placeholder="First-Last Page Number in Conference Proceedings" required>
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="pdf" class="control-label col-sm-2">PDF Upload:</label>
+					<label for="urlOnline" class="control-label col-sm-2" style="padding-top:0px">URL to Conference Proceedings:</label>
+					<div class="col-sm-10">
+						<input type="url" class="form-control" name="urlOnline" id="urlOnline" placeholder="http://url.com">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="conferenceAcceptanceRate" class="control-label col-sm-2">Conference Papers Acceptance Rate(%) (if known):</label>
+					<div class="col-sm-10">
+						<input type="number" class="form-control" name="conferenceAcceptanceRate" id="conferenceAcceptanceRate" placeholder="100.00" step=".01">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="pdf" class="control-label col-sm-2">Comments, if any (Best Paper Award, Top-Tier Conference, Invited Presentation, …):</label>
 					<div class="col-sm-10">
 						<input type="file" class="upload" name="pdf" id="pdf" accept=".pdf">
 					</div>
+					<label>Please Upload pdf Copy of the Version Published in the Conference Proceedings.<br> If you have already uploaded a file for current update and want to keep it, please leave the field blank.<br>To check all your uploaded files, please go to My Submissions. Much appreciated! </label>
 				</div>
 				
 				<div style="text-align:center">				
@@ -720,48 +1098,81 @@ function clearThesis(){
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="department" class="control-label col-sm-2" style="padding-top:0px">Student Department:</label>
+					<label for="department" class="control-label col-sm-2" style="padding-top:0px">Student Department and College:</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" name="department" id="department" placeholder="Student Department" required>
+						<input type="text" class="form-control" name="department" id="department" placeholder="Student Department and College" required>
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="completeDate" class="control-label col-sm-2">Completed Month & Year:</label>
+					<label for="yearAccepted" class="control-label col-sm-2" style="padding-top:0px">Year Accepted by Graduate Studies Office:</label>
 					<div class="col-sm-10">
-						<input type="month" class="form-control" name="completeDate" id="completeDate" required>
+						<input type="text" class="form-control" name="yearAccepted" id="yearAccepted" placeholder="YYYY" required>
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="journalPaperPub" class="control-label col-sm-2" style="padding-top:0px">Joint Journal Paper Published:</label>
+					<label for="monthAccepted" class="control-label col-sm-2" style="padding-top:0px">Month Accepted:</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" name="monthAccepted" id="monthAccepted" placeholder="January, February, …" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="thesesRole" class="control-label col-sm-2">Role?</label>
+					<div class="col-sm-10">						
+						<select class="form-control" name="thesesRole" id="thesesRole" required>
+							<option value="Main Advisor" selected>Main Advisor</option>
+							<option value="Co-Advisor">Co-Advisor</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="journalPaperPub" class="control-label col-sm-2" style="padding-top:0px">Joint Journal Paper Published?</label>
 					<div class="col-sm-10">
 						<select class="form-control" name="journalPaperPub" id="journalPaperPub" required>
-							<option value="Yes">Yes, Please Include Your Journal Pub List Below</option>
+							<option value="Yes">If Yes, Please Include in Your Journal Publications</option>
 							<option value="No" selected>No</option>									
 						</select>
 					</div>
 				</div>
-				<div class="form-group" id="journalPubListGroup" style="display:none">
+				<!-- <div class="form-group" id="journalPubListGroup" style="display:none">
 					<label for="journalPubList" class="control-label col-sm-2">Journal Pub List:</label>
 					<div class="col-sm-10">
 						<input type="text" class="form-control" name="journalPubList" id="journalPubList" placeholder="Journal Pub List">
 					</div>
-				</div>
-				
+				</div> -->
 				<div class="form-group">
-					<label for="confPaperPub" class="control-label col-sm-2" style="padding-top:0px">Conference Paper Published:</label>
+					<label for="confPaperPub" class="control-label col-sm-2" style="padding-top:0px">Joint Conference Paper Published?</label>
 					<div class="col-sm-10">
 						<select class="form-control" name="confPaperPub" id="confPaperPub">
-							<option value="Yes">Yes, Please Include Your Conference Pub List Below</option>
+							<option value="Yes">If Yes, Please Include in Your Conference Publications</option>
 							<option value="No" selected>No</option>									
 						</select>
 					</div>
 				</div>
-				<div class="form-group" id="confPubListGroup" style="display:none">
+				<!-- <div class="form-group" id="confPubListGroup" style="display:none">
 					<label for="confPubList" class="control-label col-sm-2">Conference Pub List:</label>
 					<div class="col-sm-10">
 						<input type="text" class="form-control" name="confPubList" id="confPubList" placeholder="Conference Pub List">
 					</div>
-				</div>				
+				</div>	 -->	
+				<div class="form-group">
+					<label for="thesesCommentsPDF" class="control-label col-sm-2">Comments, If Any (SJSU Best Thesis Award, Filed for Patent, …):</label>
+					<div class="col-sm-10">
+						<input type="file" class="upload" name="thesesCommentsPDF" id="thesesCommentsPDF" accept=".pdf">
+					</div>
+				</div>	
+				<div class="form-group">
+					<label for="thesesURL" class="control-label col-sm-2" style="padding-top:0px">URL to Thesis in the SJSU Library:</label>
+					<div class="col-sm-10">
+						<input type="url" class="form-control" name="thesesURL" id="thesesURL" placeholder="http://url.com">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="acceptanceLetterPDF" class="control-label col-sm-2">If URL is Not Available Yet, Please Upload pdf Files of Completed Thesis and the Graduate Studies Office Acceptance Letter:</label>
+					<div class="col-sm-10">
+						<input type="file" class="upload" name="acceptanceLetterPDF" id="acceptanceLetterPDF" accept=".pdf">
+					</div>
+					<label>Please Upload pdf Copy of the Published Version.<br> If you have already uploaded a file for current update and want to keep it, please leave the field blank.<br>To check all your uploaded files, please go to My Submissions. Much appreciated! </label>
+				</div>		
 				<div style="text-align:center">
 					<button class="btn btn-default" onclick="clearThesis()">Clear</button>
 					<button type="submit" class="btn btn-default">Submit</button>
@@ -775,47 +1186,61 @@ function clearThesis(){
 				<input type="text" name="pubID" id="pubID" style="display:none">
 				<input type="submit" style="display:none">
 			</form>
-			<h2>Journal</h2>
+			<h2>Research Grants</h2>
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>Grant Title</th>
+						<th>Funding Agency</th>
+						<th>Co-PIs and Co-Is</th>
+						<th>PDF</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody id="grantsTbody"> </tbody>
+			</table>
+			<h2>Journal Publications</h2>
 			<table class="table table-hover">
 				<thead>
 					<tr>
 						<th>Publication Title</th>
-						<th>Authors List</th>
+						<th>Ordered Authors</th>
 						<th>Journal Title</th>
-						<th>Published Date</th>
+						<th>Year Published in Print</th>
 						<th>Journal Impact Factor</th>
-						<th>Published Online</th>
-						<th>PDF</th>
+						<th>Also Published online?</th>
+						<th>Comments</th>
 						<th>Action</th>
 					</tr>
 				</thead>
 				<tbody id="journalTbody"> </tbody>
 			</table>
-			<h2>Conference</h2>
+			<h2>Conference Publications</h2>
 			<table class="table table-hover">
 				<thead>
 					<tr>
 						<th>Publication Title</th>
-						<th>Authors List</th>
+						<th>Ordered Authors</th>
 						<th>Conference Title</th>						
-						<th>Reviewd Publication</th>
+						<th>Reviewed Publication</th>
 						<th>Sponsoring Professional Organization</th>
-						<th>PDF</th>
+						<th>Comments</th>
 						<th>Action</th>
 					</tr>
 				</thead>
 				<tbody id="conferenceTbody"> </tbody>
 			</table>
-			<h2>Thesis</h2>
+			<h2>M.S. Theses Supervised</h2>
 			<table class="table table-hover">
 				<thead>
 					<tr>
 						<th>Title</th>
-						<th>Student </th>
+						<th>Student</th>
 						<th>Student Department</th>
-						<th>Completed Date</th>
-						<th>Journal Pub List</th>
-						<th>Conference Pub List</th>						
+						<th>Year Accepted</th>
+						<th>PDF</th>
+						<!-- <th>Journal Pub List</th> -->
+						<!-- <th>Conference Pub List</th>						 -->
 						<th>Action</th>
 					</tr>
 				</thead>
