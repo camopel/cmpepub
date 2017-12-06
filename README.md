@@ -1,5 +1,6 @@
 # CMPE Publications Submission App
 # V1.2.1
+## Submitter Interface
 Fixed PDF submission error for __Research Grants__ and __My Submission__ tabs.
 
 Changed __My Submission__ section fields.
@@ -22,7 +23,9 @@ Changed multiple fields to optional
 
 Changed tabs items see details below
 
-## Personal Information
+## Submitter Interface
+
+### Personal Information
 
 Changed __Present Rank__ to Select from a drop-down Menu: Professor, Associate Professor, Assistant Professor)
 
@@ -30,7 +33,7 @@ Changed __Year Joined SJSU__ to __Date Joined SJSU__ MM/YYYY; No need for a drop
 
 Added confirmation popup for update button.
 
-## Research Grants
+### Research Grants
 
 Added __Research Grants__ tab and items:
 
@@ -73,7 +76,7 @@ $$ Balance Available to Invoke for Release-Time
 
 Award Ending Date (MM/DD/YYYY)
 
-## Journal Publications
+### Journal Publications
 
 Changed tab name to __Journal Publications__
 
@@ -109,7 +112,7 @@ __URL of Online Text of the Paper__
 
 Changed label to __Comments, if any (Best Paper Award, Top-Ranked Journal, Invited Presentation, …)(Please Upload pdf Copy of the Published Version)__
 
-## Conference Publications
+### Conference Publications
 
 Changed tab name to __Conference Publications__
 
@@ -138,7 +141,7 @@ Added __Conference Papers Acceptance Rate (if known)__
 Changed label to __Comments, if any (Best Paper Award, Top-Tier Conference, Invited Presentation, …)
 (Please Upload pdf Copy of the Version Published in the Conference Proceedings)__
 
-## M.S. Theses Supervised
+### M.S. Theses Supervised
 
 Changed tab name to __M.S. Theses Supervised__
 
@@ -161,7 +164,7 @@ Added __Comments, If Any (SJSU Best Thesis Award, Filed for Patent, …)__
 Added __URL to Thesis in the SJSU Library
 (If URL is Not Available Yet, Please Upload pdf Files of Completed Thesis and the Graduate Studies Office Acceptance Letter)__
 
-## My Submissions
+### My Submissions
 
 Added __Research Grants__ section
 
