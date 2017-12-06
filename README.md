@@ -8,7 +8,7 @@ All attached files download links are visible now.
 
 # V1.2.0
 
-Added collection __grants__ to dabatase __pub__
+Added collection __grants__ to database __pub__
 
 Added and changed multiple fields names in pub's collections base on the feature requests
 
@@ -20,13 +20,13 @@ Changed file upload failure message content
 
 Changed multiple fields to optional
 
-Changed form items see details below
+Changed tabs items see details below
 
 ## Personal Information
 
-Changed __Present Rank__ to Select from a Drop Down Menu: Professor, Associate Professor, Assistant Professor)
+Changed __Present Rank__ to Select from a drop-down Menu: Professor, Associate Professor, Assistant Professor)
 
-Changed __Year Joined SJSU__ to __Date Joined SJSU__ MM/YYYY; No need for a drop down menu
+Changed __Year Joined SJSU__ to __Date Joined SJSU__ MM/YYYY; No need for a drop-down menu
 
 Added confirmation popup for update button.
 
@@ -55,7 +55,7 @@ F&A Rate Charged
 If Credit for the Award Amount is Shared, Please Upload Agreed To Amount Attributed to Each Co-PI and Co-I
 Amount of the Total Funding Attributed to You
 
-Please Upload PDF Copy of the Official Grant Award letter Received by the SJSURF 
+Please Upload PDF Copy of the Official Grant Award Letter Received by the SJSURF 
 
 Please Upload PDF Copy of the Official Grant Budge Approved by the SJSURF 
 
@@ -65,11 +65,11 @@ Total Award Amount
 
 Amount of the Total Award Attributed to You
 
-Amount Already Invoked For Release-Time in Past Academic Years
+Amount Already Invoked for Release-Time in Past Academic Years
 
 Academic Years Invoked
 
-$$ Balance Avaialble to Invoke for Release-Time 
+$$ Balance Available to Invoke for Release-Time 
 
 Award Ending Date (MM/DD/YYYY)
 
@@ -111,7 +111,7 @@ Changed label to __Comments, if any (Best Paper Award, Top-Ranked Journal, Invit
 
 ## Conference Publications
 
-Chaged tab name to __Conference Publications__
+Changed tab name to __Conference Publications__
 
 Changed label to __Ordered Authors__
 
@@ -123,7 +123,7 @@ Changed label to __Location Held (City, State/Country)__
 
 Changed label to __Year (YYYY)__
 
-__Month (Junuary, February, …)
+__Month (January, February, …)
 
 __Days (DD to DD)__
 
@@ -146,7 +146,7 @@ Changed tab name to __Student Department and College__
 
 Changed tab name to __Year Accepted by Graduate Studies Office (YYYY)
 
-Month Accepted (January, February, …)__
+__Month Accepted (January, February, …)__
 
 Added __Role? (Main Advisor, Co-Advisor)__
 
