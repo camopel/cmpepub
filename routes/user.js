@@ -59,35 +59,54 @@ module.exports =  function(db){
 				yearsInvoked:req.body.yearsInvoked.trim(),
 				balanceAvailable:req.body.balanceAvailable.trim(),
 				endDate:req.body.endDate.trim(),
-				pdfID:"",
-				pdfName:"",
+				awardPDFID:"",
+				awardPDFName:"",
+				budgePDFID:"",
+				budgePDFName:"",
 				updatetime:new Date()
 			};
 			var ObjectID = require('mongodb').ObjectID;
-			var itemID = req.body.id.length>0 ? new ObjectID(req.body.id) : new ObjectID();			
-			var pdfID = new ObjectID();
-			var file = req.files["grantAwardPDF"];
-			if(file.name && file.name.length>0){
-				file.mv(req.app.locals.uploadDir+pdfID+".pdf", function(err){
+			var itemID = req.body.id.length>0 ? new ObjectID(req.body.id) : new ObjectID();		
+			var awardPDFID = new ObjectID();
+			var budgePDFID = new ObjectID();
+			var awardPDFFile = req.files["grantAwardPDF"];
+			var budgePDFFile = req.files["grantBudgePDF"];
+			if(awardPDFFile.name && awardPDFFile.name.length>0){
+				awardPDFFile.mv(req.app.locals.uploadDir+awardPDFID+".pdf", function(err){
 					if(err!=null){						
 						res.send({"success":"false", "msg":"fail to upload file, please remove file and try again or submit without the file"});
 						return;
 					} else {
-						item["pdfID"]=pdfID;
-						item["pdfName"]=file.name;
-						db.collection('grants').updateOne({"_id":itemID},{$set:item},{upsert:true},function(err, result){
+						item["awardPDFID"]=awardPDFID;
+						item["awardPDFName"]=awardPDFFile.name;
+						db.collection('grants').updateOne({"_id":itemID}, {$set:item},{upsert:true},function(err, result){
 							if(err!=null) res.send({"success":"false","msg":"fail to update database"});
 							else res.send({"success":"true"});
 						});
 					}
 				});
-			} else {
+			} 
+			if(budgePDFFile.name && budgePDFFile.name.length>0){
+				budgePDFFile.mv(req.app.locals.uploadDir+budgePDFID+".pdf", function(err){
+					if(err!=null){						
+						res.send({"success":"false", "msg":"fail to upload file, please remove file and try again or submit without the file"});
+						return;
+					} else {
+						item["budgePDFID"]=budgePDFID;
+						item["budgePDFName"]=budgePDFFile.name;	
+						db.collection('grants').updateOne({"_id":itemID}, {$set:item},{upsert:true},function(err, result){
+							if(err!=null) res.send({"success":"false","msg":"fail to update database"});
+							else res.send({"success":"true"});
+						});				
+					}
+				});
+			} 
+			if (!(awardPDFFile.name && awardPDFFile.name.length>0) && !(budgePDFFile.name && budgePDFFile.name.length>0)) {
 				db.collection('grants').updateOne({"_id":itemID}, {$set:item},{upsert:true},function(err, result){
 					if(err!=null) res.send({"success":"false","msg":"fail to update grants"});
 					else res.send({"success":"true"});
 				});
-			}
-		}
+		}	}
 	});
 
 	router.post('/addJournal', function(req, res, next) {		
@@ -212,33 +231,56 @@ module.exports =  function(db){
 				yearAccepted:req.body.yearAccepted.trim(),
 				monthAccepted:req.body.monthAccepted.trim(),
 				thesesRole:req.body.thesesRole.trim(),
-				journalPaperPub:req.body.journalPaperPub.trim(),
+				thesesURL:req.body.thesesURL.trim(),
 				// journalPubList:req.body.journalPubList.trim(),
 				confPaperPub:req.body.confPaperPub.trim(),
+				confPaperPub:req.body.confPaperPub.trim(),
 				// confPubList:req.body.confPubList.trim(),
+				commentsPDFID:"",
+				commentsPDFName:"",
+				acceptanceLetterID:"",
+				acceptanceLetterName:"",
 				updatetime:new Date()
 			};
 			var ObjectID = require('mongodb').ObjectID;
 			var itemID = req.body.id.length>0 ? new ObjectID(req.body.id) : new ObjectID();			
-			var pdfID = new ObjectID();
-			var file = req.files["thesesCommentsPDF"];
-			if(file.name && file.name.length>0){
-				file.mv(req.app.locals.uploadDir+pdfID+".pdf", function(err){
+			var commentsPDFID = new ObjectID();
+			var acceptanceLetterID = new ObjectID();
+			var commentsFile = req.files["thesesCommentsPDF"];
+			var acceptanceLetterFile = req.files["acceptanceLetterPDF"];
+			if(commentsFile.name && commentsFile.name.length>0){
+				commentsFile.mv(req.app.locals.uploadDir+commentsPDFID+".pdf", function(err){
 					if(err!=null){						
 						res.send({"success":"false", "msg":"fail to upload file, please remove file and try again or submit without the file"});
 						return;
 					} else {
-						item["pdfID"]=pdfID;
-						item["pdfName"]=file.name;
-						db.collection('thesis').updateOne({"_id":itemID},{$set:item},{upsert:true},function(err, result){
-							if(err!=null) res.send({"success":"false","msg":"fail to update database"});
+						item["commentsPDFID"]=commentsPDFID;
+						item["commentsPDFName"]=commentsFile.name;
+						db.collection('thesis').updateOne({"_id":itemID}, {$set:item},{upsert:true},function(err, result){
+							if(err!=null) res.send({"success":"false","msg":"fail to update theses"});
 							else res.send({"success":"true"});
 						});
 					}
 				});
-			} else {
+			}
+			if(acceptanceLetterFile.name && acceptanceLetterFile.name.length>0){
+				acceptanceLetterFile.mv(req.app.locals.uploadDir+acceptanceLetterID+".pdf", function(err){
+					if(err!=null){						
+						res.send({"success":"false", "msg":"fail to upload file, please remove file and try again or submit without the file"});
+						return;
+					} else {
+						item["acceptanceLetterID"]=acceptanceLetterID;
+						item["acceptanceLetterName"]=acceptanceLetterFile.name;
+						db.collection('thesis').updateOne({"_id":itemID}, {$set:item},{upsert:true},function(err, result){
+							if(err!=null) res.send({"success":"false","msg":"fail to update theses"});
+							else res.send({"success":"true"});
+						});
+					}
+				});
+			} 
+			if (!(commentsFile.name && commentsFile.name.length>0) && !(acceptanceLetterFile.name && acceptanceLetterFile.name.length>0)) {
 				db.collection('thesis').updateOne({"_id":itemID}, {$set:item},{upsert:true},function(err, result){
-					if(err!=null) res.send({"success":"false","msg":"fail to update grants"});
+					if(err!=null) res.send({"success":"false","msg":"fail to update theses"});
 					else res.send({"success":"true"});
 				});
 			}
@@ -275,7 +317,8 @@ module.exports =  function(db){
 							yearsInvoked:data.yearsInvoked,
 							balanceAvailable:data.balanceAvailable,
 							endDate:data.endDate,
-							pdfID:data.pdfID
+							awardPDFID:data.awardPDFID,
+							budgePDFID:data.budgePDFID						
 						});
 					}
 
@@ -328,6 +371,8 @@ module.exports =  function(db){
 											thesesRole:data.thesesRole,
 											journalPaperPub:data.journalPaperPub,
 											confPaperPub:data.confPaperPub,
+											commentsPDFID:data.commentsPDFID,
+											acceptanceLetterID:data.acceptanceLetterID
 										});
 									}
 									res.send({"success":"true","data":{

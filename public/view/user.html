@@ -291,7 +291,11 @@ $(function(){
 	function thesisClick(e){
 		var _id = $(e.target).parent().parent().attr("id");
 		var action = $(e.target).html();
-		if(action=="Edit"){
+		var pdfID = $(e.target).attr("id");
+		if(action=="Download"){
+			$("#pdfID").val(pdfID);
+			$("#downloadForm").attr("action",'/user/download').submit();
+		} else if(action=="Edit"){
 			$("#tab4 #id").val(_id);
 			$('.nav-tabs a[href="#tab4"]').tab('show');
 		} else if (confirm("Want to delete?")){
@@ -541,8 +545,9 @@ $(function(){
 					var conf = data.data.conference;
 					var thesis = data.data.thesis;
 					grants.forEach(function(e) {
-						var pdf = e.pdfID==""?"":"<a id='"+e.pdfID+"'>Download</a>";				
-						$("#grantsTbody").append("<tr id='"+e.id+"'><td>"+e.grantTitle+"</td><td>"+e.fundingAgency+"</td><td>"+e.copisList+"</td><td>"+pdf+"</td><td><a>Edit</a><a style='margin-left:10px'>Delete</a></td></tr>");
+						var awardPDF = e.awardPDFID==""?"":"<a id='"+e.awardPDFID+"'>Download</a>";
+						var budgePDF = e.budgePDFID==""?"":"<a id='"+e.budgePDFID+"'>Download</a>";				
+						$("#grantsTbody").append("<tr id='"+e.id+"'><td>"+e.grantTitle+"</td><td>"+e.fundingAgency+"</td><td>"+e.copisList+"</td><td>"+awardPDF+"</td><td>"+budgePDF+"</td><td><a>Edit</a><a style='margin-left:10px'>Delete</a></td></tr>");
 					});
 					$("#grantsTbody tr td a").click(grantsClick);
 
@@ -559,8 +564,9 @@ $(function(){
 					$("#conferenceTbody tr td a").click(conferenceClick);
 					
 					thesis.forEach(function(e) {
-						var pdf = e.pdfID==""?"":"<a id='"+e.pdfID+"'>Download</a>";
-						$("#thesisTbody").append("<tr id='"+e.id+"'><td>"+e.title+"</td><td>"+e.student+"</td><td>"+e.department+"</td><td>"+e.yearAccepted+"</td><td>"+pdf+"</td><td><a>Edit</a><a style='margin-left:10px'>Delete</a></td></tr>");
+						var commentsPDF = e.commentsPDFID==""?"":"<a id='"+e.commentsPDFID+"'>Download</a>";
+						var acceptanceLetter = e.acceptanceLetterID==""?"":"<a id='"+e.acceptanceLetterID+"'>Download</a>";
+						$("#thesisTbody").append("<tr id='"+e.id+"'><td>"+e.title+"</td><td>"+e.student+"</td><td>"+e.department+"</td><td>"+e.yearAccepted+"</td><td>"+commentsPDF+"</td><td>"+acceptanceLetter+"</td><td><a>Edit</a><a style='margin-left:10px'>Delete</a></td></tr>");
 					});
 					$("#thesisTbody tr td a").click(thesisClick);
 				}
@@ -767,7 +773,7 @@ function clearThesis(){
 							<div class="col-sm-10">
 								<input type="file" class="upload" name="grantBudgePDF" id="grantBudgePDF" accept=".pdf">
 							</div>
-							<label>Please Upload pdf Copy of the Published Version. Upload both files at the same time to avoid an error message.<br> If you have already uploaded a file for current update and want to keep it, please leave the field blank.<br>To check all your uploaded files, please go to My Submissions. Much appreciated! </label>
+							<label>Please Upload pdf Copy of the Published Version.<br>There is a size limit to upload to our server, so make sure your file is not big.<br>Upload both files at the same time to avoid an error message.<br> If you have already uploaded a file for current update and want to keep it, please leave the field blank.<br>To check all your uploaded files, please go to My Submissions. Much appreciated! </label>
 						</div>	
 					</div>
 				</div>	
@@ -941,7 +947,7 @@ function clearThesis(){
 					<div class="col-sm-10">
 						<input type="file" class="upload" name="pdf" id="pdf" accept=".pdf">
 					</div>
-					<label>Please Upload pdf Copy of the Published Version.<br> If you have already uploaded a file for current update and want to keep it, please leave the field blank.<br>To check all your uploaded files, please go to My Submissions. Much appreciated! </label>
+					<label>Please Upload pdf Copy of the Published Version.<br>There is a size limit to upload to our server, so make sure your file is not big.<br> If you have already uploaded a file for current update and want to keep it, please leave the field blank.<br>To check all your uploaded files, please go to My Submissions. Much appreciated! </label>
 				</div>				
 				<div style="text-align:center">
 					<button class="btn btn-default" onclick="clearJournal()">Clear</button>
@@ -1072,7 +1078,7 @@ function clearThesis(){
 					<div class="col-sm-10">
 						<input type="file" class="upload" name="pdf" id="pdf" accept=".pdf">
 					</div>
-					<label>Please Upload pdf Copy of the Version Published in the Conference Proceedings.<br> If you have already uploaded a file for current update and want to keep it, please leave the field blank.<br>To check all your uploaded files, please go to My Submissions. Much appreciated! </label>
+					<label>Please Upload pdf Copy of the Version Published in the Conference Proceedings.<br>There is a size limit to upload to our server, so make sure your file is not big.<br> If you have already uploaded a file for current update and want to keep it, please leave the field blank.<br>To check all your uploaded files, please go to My Submissions. Much appreciated! </label>
 				</div>
 				
 				<div style="text-align:center">				
@@ -1171,7 +1177,7 @@ function clearThesis(){
 					<div class="col-sm-10">
 						<input type="file" class="upload" name="acceptanceLetterPDF" id="acceptanceLetterPDF" accept=".pdf">
 					</div>
-					<label>Please Upload pdf Copy of the Published Version.<br> If you have already uploaded a file for current update and want to keep it, please leave the field blank.<br>To check all your uploaded files, please go to My Submissions. Much appreciated! </label>
+					<label>Please Upload pdf Copy of the Published Version.<br>There is a size limit to upload to our server, so make sure your file is not big.<br>If you have already uploaded a file for current update and want to keep it, please leave the field blank.<br>To check all your uploaded files, please go to My Submissions. Much appreciated! </label>
 				</div>		
 				<div style="text-align:center">
 					<button class="btn btn-default" onclick="clearThesis()">Clear</button>
@@ -1193,7 +1199,8 @@ function clearThesis(){
 						<th>Grant Title</th>
 						<th>Funding Agency</th>
 						<th>Co-PIs and Co-Is</th>
-						<th>PDF</th>
+						<th>Grant Award PDF</th>
+						<th>Grant Budge PDF</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -1238,7 +1245,8 @@ function clearThesis(){
 						<th>Student</th>
 						<th>Student Department</th>
 						<th>Year Accepted</th>
-						<th>PDF</th>
+						<th>Comments PDF</th>
+						<th>PDF2</th>
 						<!-- <th>Journal Pub List</th> -->
 						<!-- <th>Conference Pub List</th>						 -->
 						<th>Action</th>
