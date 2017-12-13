@@ -121,7 +121,9 @@ $(function(){
 				else if(data.success=='false') alert(data.msg);
 				else{
 					$("#research_grants form")[0].reset();
-					var filerKit = $('#research_grants .upload').prop("jFiler");
+					var filerKit = $('#research_grants #awardPDF').prop("jFiler");
+					filerKit.reset();
+					var filerKit = $('#research_grants #budgePDF').prop("jFiler");
 					filerKit.reset();
 					alert("Thanks for submitting the form! You can go to My Submissions to modify your submissions.");
 				}
@@ -189,7 +191,11 @@ $(function(){
 				if (data.redirect) window.location.href = data.redirect;
 				else if(data.success=='false') alert(data.msg);
 				else{
-					$("#tab4 form")[0].reset();					
+					$("#tab4 form")[0].reset();		
+					var filerKit = $('#tab4 #commentsPDF').prop("jFiler");
+					filerKit.reset();	
+					var filerKit = $('#tab4 #acceptanceLetter').prop("jFiler");
+					filerKit.reset();		
 					alert("Thanks for submitting the form! You can go to My Submissions to modify your submissions.");
 				}
 			}
@@ -553,13 +559,13 @@ $(function(){
 
 					jnl.forEach(function(e) {
 						var pdf = e.pdfID==""?"":"<a id='"+e.pdfID+"'>Download</a>";				
-						$("#journalTbody").append("<tr id='"+e.id+"'><td>"+e.title+"</td><td>"+e.authors+"</td><td>"+e.journalTitle+"</td><td>"+e.pubMonthYear+"</td><td>"+e.impactFactor+"</td><td>"+e.pubOnline+"</td><td>"+pdf+"</td><td><a>Edit</a><a style='margin-left:10px'>Delete</a></td></tr>");
+						$("#journalTbody").append("<tr id='"+e.id+"'><td>"+e.title+"</td><td>"+e.authors+"</td><td>"+e.journalTitle+"</td><td>"+e.pubYear+"</td><td>"+e.impactFactor+"</td><td>"+e.pubOnline+"</td><td>"+pdf+"</td><td><a>Edit</a><a style='margin-left:10px'>Delete</a></td></tr>");
 					});
 					$("#journalTbody tr td a").click(journalClick);
 					
 					conf.forEach(function(e) {
 						var pdf = e.pdfID==""?"":"<a id='"+e.pdfID+"'>Download</a>";	
-						$("#conferenceTbody").append("<tr id='"+e.id+"'><td>"+e.title+"</td><td>"+e.authors+"</td><td>"+e.conferenceTitle+"</td><td>"+e.reviewed+"</td><td>"+e.sponsor+"</td><td>"+pdf+"</td><td><a>Edit</a><a style='margin-left:10px'>Delete</a></td></tr>");
+						$("#conferenceTbody").append("<tr id='"+e.id+"'><td>"+e.title+"</td><td>"+e.authors+"</td><td>"+e.conferenceTitle+"</td><td>"+e.reviewed+"</td><td>"+pdf+"</td><td><a>Edit</a><a style='margin-left:10px'>Delete</a></td></tr>");
 					});
 					$("#conferenceTbody tr td a").click(conferenceClick);
 					
@@ -581,7 +587,9 @@ $(function(){
 
 function clearGrants(){
 	$("#research_grants form")[0].reset();
-	var filerKit = $('#research_grants .upload').prop("jFiler");
+	var filerKit = $('#research_grants #awardPDF').prop("jFiler");
+	filerKit.reset();
+	var filerKit = $('#research_grants #budgePDF').prop("jFiler");
 	filerKit.reset();
 		if($("#firstTime").val()=="Yes"){
 			$("#firstTimeYes").show();
@@ -615,6 +623,10 @@ function clearConference(){
 }
 function clearThesis(){
 	$("#tab4 form")[0].reset();
+	var filerKit = $('#tab4 #commentsPDF').prop("jFiler");
+	filerKit.reset();	
+	var filerKit = $('#tab4 #acceptanceLetter').prop("jFiler");
+	filerKit.reset();
 	// if($("#journalPaperPub").val()=="Yes"){
 	// 	$("#journalPubListGroup").show();
 	// 	$('#journalPubListGroup input').attr('required', true);
@@ -763,15 +775,15 @@ function clearThesis(){
 							</div>
 						</div>	
 						<div class="form-group">
-							<label for="grantAwardPDF" class="control-label col-sm-2">Please Upload PDF Copy of the Official Grant Award Letter Received by the SJSURF:</label>
+							<label for="awardPDF" class="control-label col-sm-2">Please Upload PDF Copy of the Official Grant Award Letter Received by the SJSURF:</label>
 							<div class="col-sm-10">
-								<input type="file" class="upload" name="grantAwardPDF" id="grantAwardPDF" accept=".pdf">
+								<input type="file" class="upload" name="awardPDF" id="awardPDF" accept=".pdf">
 							</div>
 						</div>	
 						<div class="form-group">
-							<label for="grantBudgePDF" class="control-label col-sm-2">Please Upload PDF Copy of the Official Grant Budge Approved by the SJSURF:</label>
+							<label for="budgePDF" class="control-label col-sm-2">Please Upload PDF Copy of the Official Grant Budge Approved by the SJSURF:</label>
 							<div class="col-sm-10">
-								<input type="file" class="upload" name="grantBudgePDF" id="grantBudgePDF" accept=".pdf">
+								<input type="file" class="upload" name="budgePDF" id="budgePDF" accept=".pdf">
 							</div>
 							<label>Please Upload pdf Copy of the Published Version.<br>There is a size limit to upload to our server, so make sure your file is not big.<br>Upload both files at the same time to avoid an error message.<br> If you have already uploaded a file for current update and want to keep it, please leave the field blank.<br>To check all your uploaded files, please go to My Submissions. Much appreciated! </label>
 						</div>	
@@ -1161,9 +1173,9 @@ function clearThesis(){
 					</div>
 				</div>	 -->	
 				<div class="form-group">
-					<label for="thesesCommentsPDF" class="control-label col-sm-2">Comments, If Any (SJSU Best Thesis Award, Filed for Patent, …):</label>
+					<label for="commentsPDF" class="control-label col-sm-2">Comments, If Any (SJSU Best Thesis Award, Filed for Patent, …):</label>
 					<div class="col-sm-10">
-						<input type="file" class="upload" name="thesesCommentsPDF" id="thesesCommentsPDF" accept=".pdf">
+						<input type="file" class="upload" name="commentsPDF" id="commentsPDF" accept=".pdf">
 					</div>
 				</div>	
 				<div class="form-group">
@@ -1173,9 +1185,9 @@ function clearThesis(){
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="acceptanceLetterPDF" class="control-label col-sm-2">If URL is Not Available Yet, Please Upload pdf Files of Completed Thesis and the Graduate Studies Office Acceptance Letter:</label>
+					<label for="acceptanceLetter" class="control-label col-sm-2">If URL is Not Available Yet, Please Upload pdf Files of Completed Thesis and the Graduate Studies Office Acceptance Letter:</label>
 					<div class="col-sm-10">
-						<input type="file" class="upload" name="acceptanceLetterPDF" id="acceptanceLetterPDF" accept=".pdf">
+						<input type="file" class="upload" name="acceptanceLetter" id="acceptanceLetter" accept=".pdf">
 					</div>
 					<label>Please Upload pdf Copy of the Published Version.<br>There is a size limit to upload to our server, so make sure your file is not big.<br>If you have already uploaded a file for current update and want to keep it, please leave the field blank.<br>To check all your uploaded files, please go to My Submissions. Much appreciated! </label>
 				</div>		
@@ -1230,7 +1242,6 @@ function clearThesis(){
 						<th>Ordered Authors</th>
 						<th>Conference Title</th>						
 						<th>Reviewed Publication</th>
-						<th>Sponsoring Professional Organization</th>
 						<th>Comments</th>
 						<th>Action</th>
 					</tr>
